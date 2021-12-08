@@ -13,4 +13,9 @@ The converted data should be able to answer the following question:
  https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
 --- 
- 
+
+
+Role added to run lambda
+
+Policy created AthenaQueryGroup
+!!

@@ -21,9 +21,7 @@ def lambda_handler(event, context):
         data_path = f"s3://{bucket}/data/"
         db_path = f"s3://{bucket}/weather/"
         print(data_path)
-        # obj.get()['Body'].read().decode('utf-8')
-        # df = wr.s3.read_csv("s3://bucket/dataset/", dataset=True)
-        # df = wr.s3.read_csv("s3://bucket/dataset/", dataset=True)
+
         df = wr.s3.read_csv(data_path)
         
         if "weather" not in wr.catalog.databases().values:
@@ -45,6 +43,8 @@ def lambda_handler(event, context):
         )
         
     wr.athena.read_sql_query("SELECT * FROM weather_data", database="weather")
+    
+    # add sns trigger to SQL querys
     
     return {
         'statusCode': 200,

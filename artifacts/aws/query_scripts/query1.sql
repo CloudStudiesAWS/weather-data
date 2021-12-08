@@ -1,0 +1,1 @@
+-- Which date was the hottest day?

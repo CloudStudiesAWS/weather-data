@@ -1,0 +1,1 @@
+-- What was the temperature on that day?
