@@ -4,32 +4,34 @@ import boto3
 import pandas as pd
 from datetime import datetime
 
-
 s3 = boto3.resource('s3')
 
-
+client = boto3.client('sns')
 
 def lambda_handler(event, context):
-    # TODO implement
+
     for record in event['Records']:
-        object = record.get('s3').get('object')
+
+        # TODO implement
+        key = record.get('s3').get('object').get('key')
         bucket = record.get('s3').get('bucket').get('name')
-        # {'key': 's3://cloud-studies-aws-raw/data/weather.20160201.csv', 'size': 1024, 'eTag': '0123456789abcdef0123456789abcdef', 'sequencer': '0A1B2C3D4E5F678901'}
-        key = object.get('key')
-
+        
+    
         obj = s3.Object(bucket, key)
-        data_path = f"s3://{bucket}/data/"
+        data_path = f"s3://{bucket}/csv_data/"
         db_path = f"s3://{bucket}/weather/"
-        print(data_path)
-
+    
+        
         df = wr.s3.read_csv(data_path)
         
+        # creating the database if not exists 
         if "weather" not in wr.catalog.databases().values:
             wr.catalog.create_database("weather")
         
+        
+        # building table partition column 
         df['ObservationDate'] = pd.to_datetime(df['ObservationDate']).dt.date
-
-        print(df['ObservationDate'])
+    
         # 2016-02-01T00:00:00
         wr.s3.to_parquet(
             df=df,
@@ -42,10 +44,13 @@ def lambda_handler(event, context):
             partition_cols=["ObservationDate"]
         )
         
-    wr.athena.read_sql_query("SELECT * FROM weather_data", database="weather")
-    
-    # add sns trigger to SQL querys
-    
+    # SNS publish msg to start posteriors query executions
+    response = client.publish(
+        TargetArn='arn:aws:sns:us-east-1:004770887468:trigger-query-results',
+        Message='Trigger lambdas to query data'
+    )
+            
+            
     return {
         'statusCode': 200,
         'body': json.dumps('Hello from Lambda!')
