@@ -9,7 +9,7 @@ s3 = boto3.resource('s3')
 client = boto3.client('sns')
 
 def lambda_handler(event, context):
-
+    type(event)
     for record in event['Records']:
 
         # TODO implement
@@ -17,8 +17,8 @@ def lambda_handler(event, context):
         bucket = record.get('s3').get('bucket').get('name')
         
     
-        obj = s3.Object(bucket, key)
-        data_path = f"s3://{bucket}/csv_data/"
+        # obj = s3.Object(bucket, key)
+        data_path = f"s3://{bucket}/{key}"
         db_path = f"s3://{bucket}/weather/"
     
         
@@ -53,5 +53,5 @@ def lambda_handler(event, context):
             
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps(event)
     }
