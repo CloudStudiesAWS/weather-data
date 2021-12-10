@@ -7,23 +7,23 @@ from datetime import datetime
 DATABASE = 'weather'
 TABLE = 'weather_data'
 
-_input='s3://cloud-studies-aws-artifacts/root/artifacts/aws/query_scripts/hottest_day.sql'
+
 bucket = 'cloud-studies-aws-artifacts'
-key = 'root/artifacts/aws/query_scripts/hottest_day.sql'
+keyQuery = 'root/artifacts/aws/query_scripts/hottest_day.sql'
+keyView = 'root/artifacts/aws/query_views_ddl/view_hottest_day.sql'
 _output='s3://cloud-studies-aws-analytics/output/hottest_day/execution_date=' + str(datetime.now().strftime("%d-%m-%Y"))
 
 
 def lambda_handler(event, context):
     s3 = boto3.resource('s3')
 
-    obj = s3.Object(bucket, key)
+    obj = s3.Object(bucket, keyQuery)
     
     query = obj.get()['Body'].read().decode('utf-8')
-    print(query)
 
     client = boto3.client('athena')
     
-    # Athena Execution
+    # Athena Query execution 
     response = client.start_query_execution(
         QueryString=query,
         QueryExecutionContext={
@@ -34,6 +34,20 @@ def lambda_handler(event, context):
         }
     )
 
+    obj = s3.Object(bucket, keyView)
+    
+    query = obj.get()['Body'].read().decode('utf-8')
+    
+    # Query create View
+    response = client.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={
+            'Database': DATABASE
+        },
+        ResultConfiguration={
+            'OutputLocation': _output,
+        }
+    )
 
     return {
         'statusCode': 200,
