@@ -41,7 +41,7 @@ Assumption about the data and considerations:
 > Once the data lands to cloud-studies-aws-raw bucket, the data pipeline flow starts.
 The data arrives to the *csv_data/* folder, where a rule is configured to trigger a lambda function named *data-process-function* that is going to process this csv data using *awswrangler*, create a database and table if needed, organize this data on partitions and write it as parquet in another bucket named *cloud-studies-aws-analytics*.
 
-> At the end of this lambda function a message is published to a sns topic. This sns topic is used as trigger to another 3 lambda functions named hottest_day_query_function, hottest_day_region_query_function, hottest_day_temperature_query_function.
+> At the end of this lambda function 3 message are sent to SQS queues. Those SQS are used as trigger to another 3 lambda functions named hottest_day_query_function, hottest_day_region_query_function, hottest_day_temperature_query_function.
 
 > Each function are going to load a sql script that the first .bat file uploaded to the arctifact bucket and it will use those sql scripts to awnser the questions.
 
