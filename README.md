@@ -58,7 +58,9 @@ The data arrives to the *csv_data/* folder, where a rule is configured to trigge
 	- Sample: SELECT * FROM "weather"."hottest_day" (return only one record, so it is not a problem to use select * without where)
  - Second: Using S3 Select
    - At Amazon S3, Check the sample file: cloud-studies-aws-analytics/output/hottest_day_region/09-12-2021/6f74ab1e-2b31-4781-a83d-cc63c5adc676.csv and select Actions> Query with S3 Select and execute a simple query to see the record on it
-	
+
+*NOTE: The first execution when both csv files is uploaded at same time to s3, the output result is duplicated (same right result). The followings executions will delete old data and retain only one csv file result até the analytics output bucket. 
+
 > That is all, I hope you enjoy it, I have a lot of fun building this, thank you! :D
 
 --- 
