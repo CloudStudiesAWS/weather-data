@@ -26,6 +26,7 @@ Assumption about the data and considerations:
 --- 
 
 <p>This is the project repository that I use to do the challenge: https://github.com/CloudStudiesAWS/weather-data</p>
+<p>A quick video demonstration was made to ilustrate the data pipeline: https://youtu.be/x42Eqy38Uic </p>
 
 > To execute the pipeline and get the awnsers, an *AWS CLI must be configured* and the User must have S3 permissions.
 
