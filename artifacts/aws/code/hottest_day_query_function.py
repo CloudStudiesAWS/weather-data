@@ -21,10 +21,33 @@ def lambda_handler(event, context):
     
     query = obj.get()['Body'].read().decode('utf-8')
 
-    client = boto3.client('athena')
+    clientAthena = boto3.client('athena')
+    clientS3 = boto3.client('s3')
+
+    # checking if there is older data on this day
+    response = clientS3.list_objects(
+        Bucket='cloud-studies-aws-analytics',
+        Prefix='output/hottest_day/execution_date=' + str(datetime.now().strftime("%d-%m-%Y"))
+    )
+
+    # deleting any older data to replace with new one
+    if response.get('Contents') is not None:
+        for o in response['Contents']:
+            responseDel = clientS3.delete_objects(
+                Bucket='cloud-studies-aws-analytics',
+                Delete={
+                    'Objects': [
+                        {
+                            'Key': o.get('Key')
+                        },
+                    ],
+                }
+            )
+
     
-    # Athena Query execution 
-    response = client.start_query_execution(
+    
+    # Query create or replace View
+    responseAthena = clientAthena.start_query_execution(
         QueryString=query,
         QueryExecutionContext={
             'Database': DATABASE
@@ -39,17 +62,14 @@ def lambda_handler(event, context):
     query = obj.get()['Body'].read().decode('utf-8')
     
     # Query create View
-    response = client.start_query_execution(
+    response = clientAthena.start_query_execution(
         QueryString=query,
         QueryExecutionContext={
             'Database': DATABASE
-        },
-        ResultConfiguration={
-            'OutputLocation': _output,
         }
     )
 
     return {
         'statusCode': 200,
-        'body': json.dumps(response)
+        'body': json.dumps(responseAthena)
     }
